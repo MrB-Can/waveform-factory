@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.signal import square
+from scipy.signal import square as sqr
 
 
 def generate_square_wave(frequency: float, amplitude: float, length: float, sample_rate: int = 44100,
@@ -18,7 +18,7 @@ def generate_square_wave(frequency: float, amplitude: float, length: float, samp
     """
 
     t = np.linspace(0, length, int(sample_rate * length), False)  # time variable
-    waveform = square(2 * np.pi * frequency * t + phase_shift)
+    waveform = sqr(2 * np.pi * frequency * t + phase_shift)
 
     if invert:
         waveform *= -1
