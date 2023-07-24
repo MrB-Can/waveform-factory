@@ -1,7 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
-from patterns import sawtooth
+from waveform_factory.patterns import sawtooth
 
 
 def test_generate_sawtooth():
