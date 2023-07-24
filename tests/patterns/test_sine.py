@@ -1,6 +1,6 @@
 import numpy as np
 from matplotlib import pyplot as plt
-from patterns.sine import generate_sine_wave
+from waveform_factory.patterns.sine import generate_sine_wave
 
 class SineWaveTest:
     def run_tests(self):
