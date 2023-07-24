@@ -16,3 +16,5 @@ To install Waveform Factory, you can use pip:
 
 ```bash
 pip install waveformfactory
+```
+![PyPI](https://img.shields.io/pypi/v/waveform-factory.svg)
