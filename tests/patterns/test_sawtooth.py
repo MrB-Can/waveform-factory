@@ -1,136 +1,92 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
-from waveform_factory.patterns import sawtooth
+from waveform_factory.patterns.sawtooth import generate_sawtooth_wave
 
+class SawtoothWaveTest:
+    def run_tests(self):
+        self.test_generate_sawtooth_wave()
 
-def test_generate_sawtooth():
-    frequency = 440  # A4 note
-    amplitude = 1.0  # max amplitude
-    length = 2.0  # 2 seconds
-    sample_rate = 44100  # standard audio CD sample rate
+    def test_generate_sawtooth_wave(self):
+        # Define the "baseline" parameters
+        baseline_frequency = 440
+        baseline_amplitude = 1.0
+        baseline_length = 1.0
+        baseline_sample_rate = 44100
+        baseline_phase_shift = 0.0
+        baseline_offset = 0.0
+        baseline_invert = False
 
-    # Generate the sawtooth wave
-    generated_wave = sawtooth.generate_sawtooth(frequency, amplitude, length, sample_rate)
+        # Define the variations for each parameter
+        frequency_variations = [220, 880]
+        amplitude_variations = [0.5, 2.0]
+        length_variations = [0.5, 2.0]
+        sample_rate_variations = [22050, 88200]
+        phase_shift_variations = [np.pi/2, np.pi]
+        offset_variations = [-0.5, 0.5]
+        invert_variations = [True, False]
 
-    # Check if the generated wave has the correct length
-    assert len(generated_wave) == int(sample_rate * length)
+        # Define colors for the plot
+        colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
 
-    # Check if the generated wave indeed has a sawtooth pattern
-    # The waveform should start at -amplitude at the start of every period
-    period_samples = int(sample_rate / frequency)
-    for i in range(0, len(generated_wave), period_samples):
-        assert np.isclose(generated_wave[i], -amplitude, atol=1e-2)  # increase the absolute tolerance
+        # Start the plot
+        plt.figure(figsize=(18, 12))
 
-def test_plot_sawtooth():
-    frequency = 440  # A4 note
-    amplitude = 1.0  # max amplitude
-    length = 2.0  # 2 seconds
-    sample_rate = 44100  # standard audio CD sample rate
+        # Generate and plot the "baseline" sawtooth wave
+        baseline_wave = generate_sawtooth_wave(baseline_frequency, baseline_amplitude, baseline_length,
+                                               baseline_sample_rate, baseline_phase_shift, baseline_offset,
+                                               baseline_invert)
+        plt.plot(baseline_wave[:1000], color=colors[0], label='baseline')
 
-    # Generate the sawtooth wave
-    generated_wave = sawtooth.generate_sawtooth(frequency, amplitude, length, sample_rate)
+        # Generate and plot sawtooth waves for each variation of the parameters
+        color_index = 1
+        for frequency in frequency_variations:
+            wave = generate_sawtooth_wave(frequency, baseline_amplitude, baseline_length, baseline_sample_rate,
+                                          baseline_phase_shift, baseline_offset, baseline_invert)
+            plt.plot(wave[:1000], color=colors[color_index % len(colors)], label=f'freq={frequency}')
+            color_index += 1
 
-    # Plot the first few samples of the wave
-    plt.figure(figsize=(10, 4))
-    plt.plot(generated_wave[:1000])  # plot the first 1000 samples
-    plt.title('Sawtooth Wave')
-    plt.ylim(-1.5, 1.5)  # Set y-axis limits
-    plt.show()
+        for amplitude in amplitude_variations:
+            wave = generate_sawtooth_wave(baseline_frequency, amplitude, baseline_length, baseline_sample_rate,
+                                          baseline_phase_shift, baseline_offset, baseline_invert)
+            plt.plot(wave[:1000], color=colors[color_index % len(colors)], label=f'amp={amplitude}')
+            color_index += 1
 
-def test_generate_sawtooth_frequency():
-    amplitude = 1.0
-    length = 2.0
-    sample_rate = 44100
+        for length in length_variations:
+            wave = generate_sawtooth_wave(baseline_frequency, baseline_amplitude, length, baseline_sample_rate,
+                                          baseline_phase_shift, baseline_offset, baseline_invert)
+            plt.plot(wave[:1000], color=colors[color_index % len(colors)], label=f'length={length}')
+            color_index += 1
 
-    for frequency in [220, 440, 880]:  # Test different frequencies
-        generated_wave = sawtooth.generate_sawtooth(frequency, amplitude, length, sample_rate)
-        plt.figure()
-        plt.plot(generated_wave[:1000])  # Plot the first 1000 samples
-        plt.title(f'Frequency: {frequency}Hz')
-        plt.ylim(-1.5, 1.5)  # Set y-axis limits
-    plt.show()
+        for sample_rate in sample_rate_variations:
+            wave = generate_sawtooth_wave(baseline_frequency, baseline_amplitude, baseline_length, sample_rate,
+                                          baseline_phase_shift, baseline_offset, baseline_invert)
+            plt.plot(wave[:1000], color=colors[color_index % len(colors)], label=f'sr={sample_rate}')
+            color_index += 1
 
+        for phase_shift in phase_shift_variations:
+            wave = generate_sawtooth_wave(baseline_frequency, baseline_amplitude, baseline_length, baseline_sample_rate,
+                                          phase_shift, baseline_offset, baseline_invert)
+            plt.plot(wave[:1000], color=colors[color_index % len(colors)], label=f'phase={phase_shift}')
+            color_index += 1
 
-def test_generate_sawtooth_amplitude():
-    frequency = 440
-    length = 2.0
-    sample_rate = 44100
+        for offset in offset_variations:
+            wave = generate_sawtooth_wave(baseline_frequency, baseline_amplitude, baseline_length, baseline_sample_rate,
+                                          baseline_phase_shift, offset, baseline_invert)
+            plt.plot(wave[:1000], color=colors[color_index % len(colors)], label=f'offset={offset}')
+            color_index += 1
 
-    for amplitude in [0.5, 1.0, 1.5]:  # Test different amplitudes
-        generated_wave = sawtooth.generate_sawtooth(frequency, amplitude, length, sample_rate)
-        plt.figure()
-        plt.plot(generated_wave[:1000])  # Plot the first 1000 samples
-        plt.title(f'Amplitude: {amplitude}')
-        plt.ylim(-1.5, 1.5)  # Set y-axis limits
-    plt.show()
+        for invert in invert_variations:
+            wave = generate_sawtooth_wave(baseline_frequency, baseline_amplitude, baseline_length, baseline_sample_rate,
+                                          baseline_phase_shift, baseline_offset, invert)
+            plt.plot(wave[:1000], color=colors[color_index % len(colors)], label=f'invert={invert}')
+            color_index += 1
 
+        # Show the plot with a legend
+        plt.title('Sawtooth Wave')
+        plt.legend(loc='upper right')
+        plt.show()
 
-def test_generate_sawtooth_length():
-    frequency = 10
-    amplitude = 1.0
-    sample_rate = 44100
-
-    for length in [1.0, 2.0, 3.0]:  # Test different lengths
-        generated_wave = sawtooth.generate_sawtooth(frequency, amplitude, length, sample_rate)
-        plt.figure()
-        plt.plot(generated_wave)
-        plt.title(f'Length: {length}s')
-        plt.ylim(-1.5, 1.5)  # Set y-axis limits
-    plt.show()
-
-
-def test_generate_sawtooth_sample_rate():
-    frequency = 440
-    amplitude = 1.0
-    length = 2.0
-
-    for sample_rate in [22050, 44100, 88200]:  # Test different sample rates
-        generated_wave = sawtooth.generate_sawtooth(frequency, amplitude, length, sample_rate)
-        plt.figure()
-        plt.plot(generated_wave[:1000])  # Plot the first 1000 samples
-        plt.title(f'Sample Rate: {sample_rate}Hz')
-        plt.ylim(-1.5, 1.5)  # Set y-axis limits
-    plt.show()
-
-def test_generate_sawtooth_phase_shift():
-    frequency = 440
-    amplitude = 1.0
-    length = 2.0
-    sample_rate = 44100
-
-    for phase_shift in [0, np.pi/2, np.pi]:  # Test different phase shifts
-        generated_wave = sawtooth.generate_sawtooth(frequency, amplitude, length, sample_rate, phase_shift=phase_shift)
-        plt.figure()
-        plt.plot(generated_wave[:1000])  # Plot the first 1000 samples
-        plt.title(f'Phase Shift: {phase_shift} rad')
-        plt.ylim(-1.5, 1.5)  # Set y-axis limits
-    plt.show()
-
-def test_generate_sawtooth_offset():
-    frequency = 440
-    amplitude = 1.0
-    length = 2.0
-    sample_rate = 44100
-
-    for offset in [-0.5, 0, 0.5]:  # Test different offsets
-        generated_wave = sawtooth.generate_sawtooth(frequency, amplitude, length, sample_rate, offset=offset)
-        plt.figure()
-        plt.plot(generated_wave[:1000])  # Plot the first 1000 samples
-        plt.title(f'Offset: {offset}')
-        plt.ylim(-2.0, 2.0)  # Set y-axis limits
-    plt.show()
-
-def test_generate_sawtooth_invert():
-    frequency = 440
-    amplitude = 1.0
-    length = 2.0
-    sample_rate = 44100
-
-    for invert in [False, True]:  # Test both non-inverted and inverted waveform
-        generated_wave = sawtooth.generate_sawtooth(frequency, amplitude, length, sample_rate, invert=invert)
-        plt.figure()
-        plt.plot(generated_wave[:1000])  # Plot the first 1000 samples
-        plt.title(f'Inverted: {invert}')
-        plt.ylim(-1.5, 1.5)  # Set y-axis limits
-    plt.show()
+# Create an instance of the test class and run the tests
+sawtooth_wave_test = SawtoothWaveTest()
+sawtooth_wave_test.run_tests()

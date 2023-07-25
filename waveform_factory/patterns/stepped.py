@@ -1,46 +1,36 @@
 import numpy as np
-
-def generate_stepped_wave(step_height: float, step_length: int, total_steps: int, steps_up_ratio: float,
-                          length: float, sample_rate: int = 44100, offset: float = 0.0, smoothing_factor: float = 0.0):
+from matplotlib import pyplot as plt
+def generate_stepped_wave(total_periods: int, step_info: list, sample_rate: int = 44100, length: float = 1.0,
+                          offset: float = 0.0):
     """
     Generates a stepped wave (staircase) with added features.
 
-    :param step_height: The height of each step in the wave.
-    :param step_length: The length (in samples) of each step in the wave.
-    :param total_steps: The total number of steps in each cycle.
-    :param steps_up_ratio: The ratio of upward steps to the total number of steps.
-    :param length: The total length of the wave in seconds.
+    :param total_periods: The total number of periods in the waveform.
+    :param step_info: A list of dictionaries containing step information.
+                      Each dictionary should have 'height', 'start_period', and 'stop_period' keys.
     :param sample_rate: The sample rate for the wave. Default is 44100Hz (standard audio CD sample rate).
+    :param length: The total length of the wave in seconds.
     :param offset: The DC offset of the wave. Default is 0.0.
-    :param smoothing_factor: The smoothing factor for the edges of the steps. Default is 0.0 (no smoothing).
-    :return: A generator that yields samples of the generated wave.
+    :return: A numpy array representing the generated wave.
     """
-
-    steps_up = int(total_steps * steps_up_ratio)
-    steps_down = total_steps - steps_up
-
     total_samples = int(sample_rate * length)
-    num_cycles = total_samples // (step_length * total_steps)
-    remaining_samples = total_samples % (step_length * total_steps)
+    period_length = total_samples // total_periods
 
-    single_step = np.concatenate([
-        np.linspace(i * step_height, (i + 1) * step_height, step_length) for i in range(steps_up)] +
-        [np.linspace((total_steps - i - 1) * step_height, total_steps * step_height - i * step_height, step_length)
-         for i in range(steps_down)]
-    )
+    waveform = np.zeros(total_samples)
 
-    # Apply smoothing to the edges of the steps
-    if smoothing_factor > 0.0:
-        smooth_samples = int(smoothing_factor * step_length)
-        smooth_window = np.hanning(smooth_samples * 2)[:smooth_samples]  # Hanning window for smoothing
-        smooth_window /= np.sum(smooth_window)  # Normalize the window
+    for step in step_info:
+        height = step['height']
+        start_period = step['start_period']
+        stop_period = step['stop_period']
 
-        for i in range(1, steps_up + steps_down):
-            single_step[(i * step_length) - smooth_samples:i * step_length] *= smooth_window
-            single_step[i * step_length:(i * step_length) + smooth_samples] *= smooth_window[::-1]
+        start_sample = start_period * period_length
+        stop_sample = stop_period * period_length
 
-    waveform = np.tile(single_step, num_cycles)
-    waveform = np.concatenate((waveform, single_step[:remaining_samples]))  # Add remaining samples
+        # Generate the step waveform
+        step_wave = np.ones(stop_sample - start_sample) * height
+
+        # Add the step waveform to the main waveform
+        waveform[start_sample:stop_sample] = step_wave
 
     waveform += offset  # Apply DC offset
 
