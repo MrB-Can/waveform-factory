@@ -1,10 +1,6 @@
 import numpy as np
 from matplotlib import pyplot as plt
 from waveform_factory.patterns.square import generate_square_wave
-<<<<<<< HEAD
-=======
-
->>>>>>> 6e802f1251bae1c5b064f9726a1ad31c0d9bf4e4
 
 class SquareWaveTest:
     def run_tests(self):
