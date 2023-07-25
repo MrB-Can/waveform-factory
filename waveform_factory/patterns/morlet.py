@@ -1,4 +1,5 @@
 import numpy as np
+from matplotlib import pyplot as plt
 
 def generate_morlet_wave(frequency: float, amplitude: float, length: float, sample_rate: int = 44100,
                          phase_shift: float = 0.0, offset: float = 0.0, invert: bool = False) -> np.ndarray:
@@ -16,12 +17,12 @@ def generate_morlet_wave(frequency: float, amplitude: float, length: float, samp
     """
 
     t = np.linspace(0, length, int(sample_rate * length), False)  # time variable
-    waveform = np.exp(1j * 2 * np.pi * frequency * t + phase_shift)
-    waveform *= np.exp(-t**2 / 2)
+    morlet_wave = amplitude * np.exp(1j * 2 * np.pi * frequency * t + phase_shift)  # Complex sinusoid
+    morlet_wave *= np.exp(-((t - length / 2) ** 2) / (2 * (length / 8) ** 2))  # Gaussian window
 
     if invert:
-        waveform = waveform.conjugate()
+        morlet_wave = -morlet_wave
 
-    waveform = amplitude * np.real(waveform) + offset
+    morlet_wave += offset  # Apply DC offset
 
-    return waveform
+    return morlet_wave

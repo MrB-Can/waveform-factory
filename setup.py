@@ -5,7 +5,7 @@ with open('requirements.txt') as f:
 
 setup(
     name='waveform_factory',
-    version='0.1.2',
+    version='0.1.3',
     url='https://github.com/MrB-Can/waveform-factory',
     author='Paul Bennett',
     author_email='paul@lgis.ca',
